@@ -17,8 +17,8 @@ def listen():
             if answer['text']:
                 yield answer['text']
 for text in listen():
-    if text == "cценарий":
-        os.startfile("E:/reative/text/А_СценарииВидео/Сontent_warning.docx")
+    if text == "сценарий":
+        os.startfile('E:\\Creative\\text\\A_Scenario\\Content_warning.docx')
     print(text)
 # def on_key_press(event):
 #     print(event.name)

@@ -1,4 +1,5 @@
 import json, pyaudio, os, time, keyboard
+import threading
 from vosk import Model, KaldiRecognizer
 from time import time
 
@@ -13,10 +14,11 @@ Stream.start_stream()
 
 print('Конец выполнения основного кода')
 
-
+lock = threading.Lock()
 def listen():
     global listening
-    listening = True
+    with lock:
+        listening = True
     print('мы зашли в функцию')
     start_time = time()
     one_frame_time = start_time + 6
@@ -28,7 +30,9 @@ def listen():
             answer = json.loads(rec.Result())
             if answer['text']:
                 yield answer['text']
-    listening = False
+    with lock:
+        listening = False
+
 
 
 def check():
@@ -39,16 +43,18 @@ def check():
 
         if text == "сайт":
             url = 'https://www.youtube.com'
-            os.system(f'start {url}')
+            os.system(f'start {url}')?
 
 
 def on_key_press(event):
-    global listening, processing_key_press
-    if event.name == 'pause' and not listening:
-        check()
+    global listening
+    with lock:
+        if event.name == 'pause' and not listening:
+            t = threading.Thread(target=check)
+            t.start()
 
 
 
-if listening is False:
-    keyboard.on_press(on_key_press)
-    keyboard.wait('esc')  # Ждем нажатия клавиши Esc для завершения
+
+keyboard.on_press(on_key_press)
+keyboard.wait('esc')  # Ждем нажатия клавиши Esc для завершения
